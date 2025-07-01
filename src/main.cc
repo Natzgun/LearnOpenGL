@@ -50,6 +50,23 @@ int main(int argc, char *argv[]) {
    * cierto evento*/
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
+  /* La condicion revisa en cada loop si hay una instruccion que va cerrar la
+   * ventana */
+  while (!glfwWindowShouldClose(window)) {
+
+    /* glfwSwapBuffers(window) intercambia el back buffer (donde OpenGL dibuja)
+    con el front buffer (lo que se ve en pantalla). Durante cada frame, todo
+    se dibuja primero en el back buffer, que es básicamente una imagen 2D con
+    los colores de cada píxel (color buffer). Una vez que el frame está
+    listo, glfwSwapBuffers lo muestra en la ventana. */
+    glfwSwapBuffers(window);
+    /* Verifica si un evento se ha activado, en base a ella actualiza el estado
+     * de la ventana y llama a las funciones callback que yo haya registrado*/
+    glfwPollEvents();
+  }
+
+  /*Limpiamos los recursos de GLFW asignados*/
+  glfwTerminate();
   return 0;
 }
 
