@@ -3,6 +3,7 @@
 #include <iostream>
 #include <ostream>
 
+void processInput(GLFWwindow *window);
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
 int main(int argc, char *argv[]) {
@@ -54,6 +55,18 @@ int main(int argc, char *argv[]) {
    * ventana */
   while (!glfwWindowShouldClose(window)) {
 
+    // --- Input ---
+    processInput(window);
+
+    // -- Funciones de render ---
+
+    // Define el color con el que se va limpiar el color buffer, osea cuando
+    // limpie el color buffer del frame anterior lo va llenar con estre color
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    /* Borra el contenido del color buffer osea del frame anterior y lo rellena
+     * con el color definido por glClearColor*/
+    glClear(GL_COLOR_BUFFER_BIT);
+
     /* glfwSwapBuffers(window) intercambia el back buffer (donde OpenGL dibuja)
     con el front buffer (lo que se ve en pantalla). Durante cada frame, todo
     se dibuja primero en el back buffer, que es básicamente una imagen 2D con
@@ -68,6 +81,14 @@ int main(int argc, char *argv[]) {
   /*Limpiamos los recursos de GLFW asignados*/
   glfwTerminate();
   return 0;
+}
+
+void processInput(GLFWwindow *window) {
+  /* Aqui verificamos si el ultimo estado del teclado ha sido presionado para
+   * una ventana especifica*/
+  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+    glfwSetWindowShouldClose(window, true);
+  }
 }
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
