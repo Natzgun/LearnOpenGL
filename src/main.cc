@@ -62,30 +62,7 @@ int main(int argc, char *argv[]) {
     return -1;
   }
 
-  /* Aqui creamos un Vertex buffer object, generamos ese buffer que viene desde
-   * la la GPU es como si reservaramos memoria*/
-  unsigned int VBO;
-  glGenBuffers(1, &VBO);
-
-  /* Ahora enlazamos ese buffer a su tipo correspondiente en OpenGL que vendria
-   * ser GL_ARRAY_BUFFER, entonces cuando modifiquemos GL_ARRAY_BUFFER vamos a
-   * estar modificando  VBO*/
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-  /* Verices del triangulo pero estas coordenadas estan en NDC (Normalized
-   * Device Corrdinates) que van desde -1.0 hasta 1.0, cualquier valor fuera de
-   * este rango OpenGL no los mostrará*/
-  float vertices[] = {
-    -0.5f, -0.5f, 0.0f,
-    0.5f, -0.5f, 0.0f,
-    0.0f, 0.5f, 0.0f,
-  };
-
-  /* Transfiere los vertices en el rango NDC hacia el buffer de vertexs, el
-   * ultimo parametro es para indicarle como debemos manejar la CPU, en este
-   * caso GL_STATIC_DRAW setea los valores una vez y lo usamos muchas veces */
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
+  /* ----------- SETUP SHADERS -----------*/
   /* Crea un object shader que se va identificar con un unsigned int, y luego
    * cramos el shader, el argumento es el tipo de shader, por lo que este object
    * shader sera un vertex shader */
@@ -142,8 +119,46 @@ int main(int argc, char *argv[]) {
   }
 
   /* Podemos activar este Program Object con glUseProgram(shaderProgram), y no olvidemos eliminar los shaders ya vinculados, podemos ponerlo al final del codigo */
-  
 
+  glDeleteShader(vertexShader);
+  glDeleteShader(fragmentShader);
+
+  /* ------------ SETUP VERTEX DATA ------------*/
+  /* Verices del triangulo pero estas coordenadas estan en NDC (Normalized
+   * Device Corrdinates) que van desde -1.0 hasta 1.0, cualquier valor fuera de
+   * este rango OpenGL no los mostrará*/
+  float vertices[] = {
+    -0.5f, -0.5f, 0.0f,
+    0.5f, -0.5f, 0.0f,
+    0.0f, 0.5f, 0.0f,
+  };
+
+  /* Aqui creamos un Vertex buffer object, generamos ese buffer que viene desde
+   * la la GPU es como si reservaramos memoria*/
+  unsigned int VBO, VAO;
+  glGenBuffers(1, &VBO);
+  /* Vertex Array Object (VAO)*/
+  /* Una VAO nos sirve para almacenar configuracion de nuestros atributos de vertice y que VBO usar*/
+  glGenVertexArrays(1, &VAO);
+
+  /*Vinculamos el VAO*/
+  glBindVertexArray(VAO);
+
+  /* Ahora enlazamos ese buffer a su tipo correspondiente en OpenGL que vendria
+   * ser GL_ARRAY_BUFFER, entonces cuando modifiquemos GL_ARRAY_BUFFER vamos a
+   * estar modificando  VBO*/
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+  /* Transfiere los vertices en el rango NDC hacia el buffer de vertexs, el
+   * ultimo parametro es para indicarle como debemos manejar la GPU, en este
+   * caso GL_STATIC_DRAW setea los valores una vez y lo usamos muchas veces */
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+  /*Le decimos a OpenGL como debe interpretar los datos del vertex,
+   * (configurarmos los atributos de vertice)*/
+  // Todo esto quedara guardado en el VAO
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+  glEnableVertexAttribArray(0);
 
   /* La condicion revisa en cada loop si hay una instruccion que va cerrar la
    * ventana */
@@ -161,6 +176,18 @@ int main(int argc, char *argv[]) {
      * con el color definido por glClearColor*/
     glClear(GL_COLOR_BUFFER_BIT);
 
+    // Draw the object
+    glUseProgram(shaderProgram);
+    // Aqui le decimos que use el VAO con la configuracion que ya guardamos antes
+    glBindVertexArray(VAO);
+
+    /* Dibuja primitivas utilizando el shader actualmente activo */
+    /* Primer argumento, tipo primitivo de OpenGL, el segundo elemento
+     * especifica el índice inicial del array de vertices, el último parametro
+     * especifica cuántos verttices queremos dibujar que es 3, ya que nuestro
+     * arreglo de vertices tiene exactamente 3 vertices */
+    glDrawArrays(GL_LINE_LOOP, 0, 3);
+
     /* glfwSwapBuffers(window) intercambia el back buffer (donde OpenGL dibuja)
     con el front buffer (lo que se ve en pantalla). Durante cada frame, todo
     se dibuja primero en el back buffer, que es básicamente una imagen 2D con
@@ -171,9 +198,6 @@ int main(int argc, char *argv[]) {
      * de la ventana y llama a las funciones callback que yo haya registrado*/
     glfwPollEvents();
   }
-
-  glDeleteShader(vertexShader);
-  glDeleteShader(fragmentShader);
 
   /*Limpiamos los recursos de GLFW asignados*/
   glfwTerminate();
