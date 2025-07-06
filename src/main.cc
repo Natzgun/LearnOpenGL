@@ -34,6 +34,12 @@ int main(int argc, char *argv[]) {
   /* Indicamos a GLFW que convierta el contexto de nuestra ventana en el
    * contexto principal del hilo actual*/
   glfwMakeContextCurrent(window);
+  /* Aqui glfw esta llamando a mi callback por mi cuando se haga un resize de la
+   * ventana, el callback tiene que cumplir el contrato que espera como segundo
+   * argumento de la funcion (puede llamarse como quiera). Un Callback es una
+   * funcion que yo defino pero que otro programa la llama por mi cuando ocurra
+   * cierto evento*/
+  glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
   /* gladLoadGLLoader necesita cargar los punteros de funcion de opengl es por
    * eso que antes de llamar a cualquier funcion de openGL necesitamos
@@ -44,12 +50,6 @@ int main(int argc, char *argv[]) {
     return -1;
   }
 
-  /* Aqui glfw esta llamando a mi callback por mi cuando se haga un resize de la
-   * ventana, el callback tiene que cumplir el contrato que espera como segundo
-   * argumento de la funcion (puede llamarse como quiera). Un Callback es una
-   * funcion que yo defino pero que otro programa la llama por mi cuando ocurra
-   * cierto evento*/
-  glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
   /* La condicion revisa en cada loop si hay una instruccion que va cerrar la
    * ventana */
