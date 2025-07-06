@@ -6,6 +6,12 @@
 void processInput(GLFWwindow *window);
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
+const char *vertexShaderSource = "#version 330 core\n"
+  "layout (location = 0) in vec3 aPos;\n"
+  "void main() {\n"
+  "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+  "}\0";
+
 int main(int argc, char *argv[]) {
   /* Esto inicializa GLFW con sus valores predeterminados, retorna GLFW_TRUE si
    * tiene exito
@@ -50,6 +56,53 @@ int main(int argc, char *argv[]) {
     return -1;
   }
 
+  /* Aqui creamos un Vertex buffer object, generamos ese buffer que viene desde
+   * la la GPU es como si reservaramos memoria*/
+  unsigned int VBO;
+  glGenBuffers(1, &VBO);
+
+  /* Ahora enlazamos ese buffer a su tipo correspondiente en OpenGL que vendria
+   * ser GL_ARRAY_BUFFER, entonces cuando modifiquemos GL_ARRAY_BUFFER vamos a
+   * estar modificando  VBO*/
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+  /* Verices del triangulo pero estas coordenadas estan en NDC (Normalized
+   * Device Corrdinates) que van desde -1.0 hasta 1.0, cualquier valor fuera de
+   * este rango OpenGL no los mostrará*/
+  float vertices[] = {
+    -0.5f, -0.5f, 0.0f,
+    0.5f, -0.5f, 0.0f,
+    0.0f, 0.5f, 0.0f,
+  };
+
+  /* Transfiere los vertices en el rango NDC hacia el buffer de vertexs, el
+   * ultimo parametro es para indicarle como debemos manejar la CPU, en este
+   * caso GL_STATIC_DRAW setea los valores una vez y lo usamos muchas veces */
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+  /* Crea un object shader que se va identificar con un unsigned int, y luego
+   * cramos el shader, el argumento es el tipo de shader, por lo que este object
+   * shader sera un vertex shader */
+  unsigned int vertexShader;
+  vertexShader = glCreateShader(GL_VERTEX_SHADER);
+
+  /*Ahora enlazamos el codigo del shader con shader object (vertex shader en
+   * este caso) y luego compilamos el shader, el segundo argumento es apra
+   * indicar cuantos string le vamos a pasar en este caso solo 1, el ultimo
+   * argument es un arreglo de longitudes en este caso NULL hace referencia a
+   * que encontraremos un \0 al final*/
+  glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+  glCompileShader(vertexShader);
+
+  /* Revisamos si la compilacion del shader fue exitosa */
+  int success;
+  char infoLog[512];
+  glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+  if (!success) {
+    glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+    std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n"
+              << infoLog << std::endl;
+  }
 
   /* La condicion revisa en cada loop si hay una instruccion que va cerrar la
    * ventana */
