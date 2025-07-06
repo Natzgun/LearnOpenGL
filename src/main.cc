@@ -12,6 +12,12 @@ const char *vertexShaderSource = "#version 330 core\n"
   "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
   "}\0";
 
+const char * fragmentShaderSource = "#version 330 core\n"
+"out vec4 FragColor;\n"
+"void main() {\n"
+"    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+"}\0"; 
+
 int main(int argc, char *argv[]) {
   /* Esto inicializa GLFW con sus valores predeterminados, retorna GLFW_TRUE si
    * tiene exito
@@ -104,6 +110,41 @@ int main(int argc, char *argv[]) {
               << infoLog << std::endl;
   }
 
+  /*La funcion principal de un Fragment shader es calcular el color de salida de
+   * los pixeles, el FS siembre generará un color anaranjado*/
+
+  unsigned int fragmentShader;
+  fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+  glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+  glCompileShader(fragmentShader);
+ 
+  // Verificamos que no haya error en la compilacion
+  glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+  if (!success) {
+    glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+    std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n"
+              << infoLog << std::endl;
+  }
+
+  /*Un Shader Program es la version final enlazada de varios shaders combinados,
+   * asi que creamos uno*/
+  unsigned int shaderProgram;
+  shaderProgram = glCreateProgram();
+
+  /*Ahora adjuntamos los shaders previamente compilados  al Program Object*/
+  glAttachShader(shaderProgram, vertexShader);
+  glAttachShader(shaderProgram, fragmentShader);
+  glLinkProgram(shaderProgram);
+
+  glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+  if (!success) {
+    glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+  }
+
+  /* Podemos activar este Program Object con glUseProgram(shaderProgram), y no olvidemos eliminar los shaders ya vinculados, podemos ponerlo al final del codigo */
+  
+
+
   /* La condicion revisa en cada loop si hay una instruccion que va cerrar la
    * ventana */
   while (!glfwWindowShouldClose(window)) {
@@ -130,6 +171,9 @@ int main(int argc, char *argv[]) {
      * de la ventana y llama a las funciones callback que yo haya registrado*/
     glfwPollEvents();
   }
+
+  glDeleteShader(vertexShader);
+  glDeleteShader(fragmentShader);
 
   /*Limpiamos los recursos de GLFW asignados*/
   glfwTerminate();
