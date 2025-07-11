@@ -128,18 +128,28 @@ int main(int argc, char *argv[]) {
    * Device Corrdinates) que van desde -1.0 hasta 1.0, cualquier valor fuera de
    * este rango OpenGL no los mostrará*/
   float vertices[] = {
-    -0.5f, -0.5f, 0.0f,
-    0.5f, -0.5f, 0.0f,
-    0.0f, 0.5f, 0.0f,
+      0.5f,  0.5f,  0.0f, // top right
+      0.5f,  -0.5f, 0.0f, // bottom right
+      -0.5f, -0.5f, 0.0f, // bottom left
+      -0.5f, 0.5f,  0.0f  // top left
+  };
+
+  // Podemos cargar solo 4 vertices y con esos 4 vertices podemos dibujar 2
+  // triangulos los indices son las posiciones de los vertices, asi evitamos
+  // sobreposicion de vertices
+  unsigned int indices[] = {
+      0, 1, 3, // first triangle
+      1, 2, 3  // second triangle
   };
 
   /* Aqui creamos un Vertex buffer object, generamos ese buffer que viene desde
    * la la GPU es como si reservaramos memoria*/
-  unsigned int VBO, VAO;
-  glGenBuffers(1, &VBO);
+  unsigned int VBO, VAO, EBO;
   /* Vertex Array Object (VAO)*/
   /* Una VAO nos sirve para almacenar configuracion de nuestros atributos de vertice y que VBO usar*/
   glGenVertexArrays(1, &VAO);
+  glGenBuffers(1, &VBO);
+  glGenBuffers(1, &EBO);
 
   /*Vinculamos el VAO*/
   glBindVertexArray(VAO);
@@ -154,11 +164,21 @@ int main(int argc, char *argv[]) {
    * caso GL_STATIC_DRAW setea los valores una vez y lo usamos muchas veces */
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
   /*Le decimos a OpenGL como debe interpretar los datos del vertex,
    * (configurarmos los atributos de vertice)*/
   // Todo esto quedara guardado en el VAO
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
+
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+  glBindVertexArray(0);
+  
+  // Podemos entrar en modo wireframe
+  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
   /* La condicion revisa en cada loop si hay una instruccion que va cerrar la
    * ventana */
@@ -186,7 +206,13 @@ int main(int argc, char *argv[]) {
      * especifica el índice inicial del array de vertices, el último parametro
      * especifica cuántos verttices queremos dibujar que es 3, ya que nuestro
      * arreglo de vertices tiene exactamente 3 vertices */
-    glDrawArrays(GL_LINE_LOOP, 0, 3);
+    //glDrawArrays(GL_LINE_LOOP, 0, 3);
+
+    /* Ahora ya no dibujamos desde vertices sino desde los indices del
+     * elememento, el primer argumento es el tipo el segudo cuantos vertices
+     * queremos dibujar, el tercer argumento es el tipo de indices y el ultimo
+     * nos permite especificar el desplazamiento en el EBO*/
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
     /* glfwSwapBuffers(window) intercambia el back buffer (donde OpenGL dibuja)
     con el front buffer (lo que se ve en pantalla). Durante cada frame, todo
