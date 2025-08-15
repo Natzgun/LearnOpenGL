@@ -128,18 +128,43 @@ int main(int argc, char *argv[]) {
    * Device Corrdinates) que van desde -1.0 hasta 1.0, cualquier valor fuera de
    * este rango OpenGL no los mostrará*/
   float vertices[] = {
-      0.5f,  0.5f,  0.0f, // top right
-      0.5f,  -0.5f, 0.0f, // bottom right
-      -0.5f, -0.5f, 0.0f, // bottom left
-      -0.5f, 0.5f,  0.0f  // top left
+    -0.6f,  0.7f,  0.0f,
+    -0.3f,  0.7f,  0.0f,
+    -0.6f, -0.7f,  0.0f,
+    -0.3f, -0.7f,  0.0f,
+
+    0.3f,  0.7f,  0.0f,
+    0.6f,  0.7f, 0.0f,
+    0.3f, -0.7f, 0.0f,
+    0.6f, -0.7f,  0.0f,
+
+    -0.6f, 0.5f,  0.0f,
+    // -0.3f, -0.7f, 0.0f,
+    0.6f, -0.5f, 0.0f,
+    // 0.3f, -0.7f,  0.0f,
+
   };
+    //  float vertices[] = {
+    //     // first triangle
+    //     -0.9f, -0.5f, 0.0f,  // left 
+    //     -0.0f, -0.5f, 0.0f,  // right
+    //     -0.45f, 0.5f, 0.0f,  // top 
+    //     // second triangle
+    //      0.0f, -0.5f, 0.0f,  // left
+    //      0.9f, -0.5f, 0.0f,  // right
+    //      0.45f, 0.5f, 0.0f   // top 
+    // };
 
   // Podemos cargar solo 4 vertices y con esos 4 vertices podemos dibujar 2
   // triangulos los indices son las posiciones de los vertices, asi evitamos
   // sobreposicion de vertices
   unsigned int indices[] = {
-      0, 1, 3, // first triangle
-      1, 2, 3  // second triangle
+      0, 1, 3,
+      0, 2, 3,
+      4, 5, 6,
+      5, 6, 7,
+      1, 8, 9,
+      6, 8, 9
   };
 
   /* Aqui creamos un Vertex buffer object, generamos ese buffer que viene desde
@@ -206,13 +231,13 @@ int main(int argc, char *argv[]) {
      * especifica el índice inicial del array de vertices, el último parametro
      * especifica cuántos verttices queremos dibujar que es 3, ya que nuestro
      * arreglo de vertices tiene exactamente 3 vertices */
-    //glDrawArrays(GL_LINE_LOOP, 0, 3);
+    // glDrawArrays(GL_TRIANGLES, 0, 12);
 
     /* Ahora ya no dibujamos desde vertices sino desde los indices del
      * elememento, el primer argumento es el tipo el segudo cuantos vertices
      * queremos dibujar, el tercer argumento es el tipo de indices y el ultimo
      * nos permite especificar el desplazamiento en el EBO*/
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, 0);
 
     /* glfwSwapBuffers(window) intercambia el back buffer (donde OpenGL dibuja)
     con el front buffer (lo que se ve en pantalla). Durante cada frame, todo
