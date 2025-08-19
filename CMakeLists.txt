@@ -14,6 +14,6 @@ pkg_search_module(GLFW REQUIRED glfw3)
 include_directories(${GLFW_INCLUDE_DIRS})
 link_directories(${GLFW_LIBRARY_DIRS})
 
-add_executable(OpenGL-project src/hello_triangle_exercise_2.cc)
+add_executable(OpenGL-project src/shaders.cc)
 
 target_link_libraries(OpenGL-project glad ${GLFW_LIBRARIES} dl GL)
