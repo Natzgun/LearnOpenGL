@@ -8,6 +8,9 @@
 void processInput(GLFWwindow *window);
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
+float xMove = 0.0f;
+float yMove = 0.0f;
+
 int main(int argc, char *argv[]) {
   /* Esto inicializa GLFW con sus valores predeterminados, retorna GLFW_TRUE si
    * tiene exito
@@ -136,10 +139,14 @@ int main(int argc, char *argv[]) {
 
 
     // float timeValue = glfwGetTime();
-    // float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
     // int vertexColorLocation =  glGetUniformLocation(shaderProgram, "ourColor");
-    ourShader.use();
+    // ourShader.use();
     // glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+    
+
+    ourShader.use();
+    ourShader.setFloat("xOffset", xMove);
+    ourShader.setFloat("yOffset", yMove);
     glBindVertexArray(VAO);
 
     glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
@@ -165,7 +172,17 @@ void processInput(GLFWwindow *window) {
    * una ventana especifica*/
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, true);
+  } else if (glfwGetKey(window, GLFW_KEY_W)) {
+    yMove += 0.005;
+  } else if (glfwGetKey(window, GLFW_KEY_A)) {
+    xMove -= 0.005;
+  } else if (glfwGetKey(window, GLFW_KEY_S)) {
+    yMove -= 0.005;
+  } else if (glfwGetKey(window, GLFW_KEY_D)) {
+    xMove += 0.005;
   }
+
+
 }
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
