@@ -143,10 +143,14 @@ int main(int argc, char *argv[]) {
     // ourShader.use();
     // glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
     
+    float timeValue = glfwGetTime();
 
     ourShader.use();
     ourShader.setFloat("xOffset", xMove);
     ourShader.setFloat("yOffset", yMove);
+    ourShader.setFloat("time", timeValue);
+
+    // ourShader.setColorRGB("customColor", colors[0], colors[1], colors[2]);
     glBindVertexArray(VAO);
 
     glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
