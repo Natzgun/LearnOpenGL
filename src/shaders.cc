@@ -1,3 +1,4 @@
+#include "Shader.h"
 #include <ctime>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -6,27 +7,6 @@
 
 void processInput(GLFWwindow *window);
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
-
-const char* vertexShaderSource = R"(
-  #version 330 core
-  layout (location = 0) in vec3 aPos;
-  layout (location = 1) in vec3 aColor;
-  out vec3 ourColor;
-  void main() {
-    gl_Position = vec4(aPos, 1.0);
-    ourColor = aColor;
-  }
-)";
-
-const char* fragmentShaderSource = R"(
-  #version 330 core
-  out vec4 FragColor;
-  // in vec4 vertexColor;
-  in vec3 ourColor;
-  void main() {
-    FragColor = vec4(ourColor, 1.0);
-  }
-)";
 
 int main(int argc, char *argv[]) {
   /* Esto inicializa GLFW con sus valores predeterminados, retorna GLFW_TRUE si
@@ -73,65 +53,8 @@ int main(int argc, char *argv[]) {
   }
 
   /* ----------- SETUP SHADERS -----------*/
-  /* Crea un object shader que se va identificar con un unsigned int, y luego
-   * cramos el shader, el argumento es el tipo de shader, por lo que este object
-   * shader sera un vertex shader */
-  unsigned int vertexShader;
-  vertexShader = glCreateShader(GL_VERTEX_SHADER);
-
-  /*Ahora enlazamos el codigo del shader con shader object (vertex shader en
-   * este caso) y luego compilamos el shader, el segundo argumento es apra
-   * indicar cuantos string le vamos a pasar en este caso solo 1, el ultimo
-   * argument es un arreglo de longitudes en este caso NULL hace referencia a
-   * que encontraremos un \0 al final*/
-  glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-  glCompileShader(vertexShader);
-
-  /* Revisamos si la compilacion del shader fue exitosa */
-  int success;
-  char infoLog[512];
-  glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-  if (!success) {
-    glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-    std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n"
-              << infoLog << std::endl;
-  }
-
-  /*La funcion principal de un Fragment shader es calcular el color de salida de
-   * los pixeles, el FS siembre generará un color anaranjado*/
-
-  unsigned int fragmentShader;
-  fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-  glCompileShader(fragmentShader);
- 
-  // Verificamos que no haya error en la compilacion
-  glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-  if (!success) {
-    glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-    std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n"
-              << infoLog << std::endl;
-  }
-
-  /*Un Shader Program es la version final enlazada de varios shaders combinados,
-   * asi que creamos uno*/
-  unsigned int shaderProgram;
-  shaderProgram = glCreateProgram();
-
-  /*Ahora adjuntamos los shaders previamente compilados  al Program Object*/
-  glAttachShader(shaderProgram, vertexShader);
-  glAttachShader(shaderProgram, fragmentShader);
-  glLinkProgram(shaderProgram);
-
-  glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-  if (!success) {
-    glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-  }
-
-  /* Podemos activar este Program Object con glUseProgram(shaderProgram), y no olvidemos eliminar los shaders ya vinculados, podemos ponerlo al final del codigo */
-
-  glDeleteShader(vertexShader);
-  glDeleteShader(fragmentShader);
+  Shader ourShader("../../src/shaders/shader.vert",
+                   "../../src/shaders/shader.frag");
 
   /* ------------ SETUP VERTEX DATA ------------*/
   /* Verices del triangulo pero estas coordenadas estan en NDC (Normalized
@@ -215,7 +138,7 @@ int main(int argc, char *argv[]) {
     // float timeValue = glfwGetTime();
     // float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
     // int vertexColorLocation =  glGetUniformLocation(shaderProgram, "ourColor");
-    glUseProgram(shaderProgram);
+    ourShader.use();
     // glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
     glBindVertexArray(VAO);
 
