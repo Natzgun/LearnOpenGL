@@ -16,7 +16,8 @@ I use this tutorial for learning:
 
 📹 Demo video:
 
-[▶️ Watch demo](screenshots/triangle.mp4)
+
+https://github.com/user-attachments/assets/b94d9911-b5d3-4076-84a0-f34d2222e954
 
 ---
 
