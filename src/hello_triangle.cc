@@ -1,22 +1,25 @@
-#include "glad/glad.h"
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+#include <glad/glad.h>
 #include <iostream>
 #include <ostream>
 
 void processInput(GLFWwindow *window);
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
-const char *vertexShaderSource = "#version 330 core\n"
-  "layout (location = 0) in vec3 aPos;\n"
-  "void main() {\n"
-  "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-  "}\0";
+const char *vertexShaderSource =
+    "#version 330 core\n"
+    "layout (location = 0) in vec3 aPos;\n"
+    "void main() {\n"
+    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+    "}\0";
 
-const char * fragmentShaderSource = "#version 330 core\n"
-"out vec4 FragColor;\n"
-"void main() {\n"
-"    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-"}\0"; 
+const char *fragmentShaderSource =
+    "#version 330 core\n"
+    "out vec4 FragColor;\n"
+    "void main() {\n"
+    "    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+    "}\0";
 
 int main(int argc, char *argv[]) {
   /* Esto inicializa GLFW con sus valores predeterminados, retorna GLFW_TRUE si
@@ -70,7 +73,7 @@ int main(int argc, char *argv[]) {
   vertexShader = glCreateShader(GL_VERTEX_SHADER);
 
   /*Ahora enlazamos el codigo del shader con shader object (vertex shader en
-   * este caso) y luego compilamos el shader, el segundo argumento es apra
+   * este caso) y luego compilamos el shader, el segundo argumento es para
    * indicar cuantos string le vamos a pasar en este caso solo 1, el ultimo
    * argument es un arreglo de longitudes en este caso NULL hace referencia a
    * que encontraremos un \0 al final*/
@@ -94,7 +97,7 @@ int main(int argc, char *argv[]) {
   fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
   glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
   glCompileShader(fragmentShader);
- 
+
   // Verificamos que no haya error en la compilacion
   glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
   if (!success) {
@@ -118,7 +121,9 @@ int main(int argc, char *argv[]) {
     glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
   }
 
-  /* Podemos activar este Program Object con glUseProgram(shaderProgram), y no olvidemos eliminar los shaders ya vinculados, podemos ponerlo al final del codigo */
+  /* Podemos activar este Program Object con glUseProgram(shaderProgram), y no
+   * olvidemos eliminar los shaders ya vinculados, podemos ponerlo al final del
+   * codigo */
 
   glDeleteShader(vertexShader);
   glDeleteShader(fragmentShader);
@@ -146,7 +151,8 @@ int main(int argc, char *argv[]) {
    * la la GPU es como si reservaramos memoria*/
   unsigned int VBO, VAO, EBO;
   /* Vertex Array Object (VAO)*/
-  /* Una VAO nos sirve para almacenar configuracion de nuestros atributos de vertice y que VBO usar*/
+  /* Una VAO nos sirve para almacenar configuracion de nuestros atributos de
+   * vertice y que VBO usar*/
   glGenVertexArrays(1, &VAO);
   glGenBuffers(1, &VBO);
   glGenBuffers(1, &EBO);
@@ -165,7 +171,8 @@ int main(int argc, char *argv[]) {
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
+               GL_STATIC_DRAW);
 
   /*Le decimos a OpenGL como debe interpretar los datos del vertex,
    * (configurarmos los atributos de vertice)*/
@@ -173,12 +180,14 @@ int main(int argc, char *argv[]) {
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
 
+  // Como ya se ha almacenado todo en el VAO desvinculamos el array buffer (VBO)
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+  // Desvinculamos el VAO, pero no el EBO porque el EBO esta registrado en el VAO
   glBindVertexArray(0);
-  
+
   // Podemos entrar en modo wireframe
-  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
   /* La condicion revisa en cada loop si hay una instruccion que va cerrar la
    * ventana */
@@ -190,7 +199,7 @@ int main(int argc, char *argv[]) {
     // -- Funciones de render ---
 
     // Define el color con el que se va limpiar el color buffer, osea cuando
-    // limpie el color buffer del frame anterior lo va llenar con estre color
+    // limpie el color buffer del frame anterior lo va llenar con este color
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     /* Borra el contenido del color buffer osea del frame anterior y lo rellena
      * con el color definido por glClearColor*/
@@ -198,7 +207,8 @@ int main(int argc, char *argv[]) {
 
     // Draw the object
     glUseProgram(shaderProgram);
-    // Aqui le decimos que use el VAO con la configuracion que ya guardamos antes
+    // Aqui le decimos que use el VAO con la configuracion que ya guardamos
+    // antes
     glBindVertexArray(VAO);
 
     /* Dibuja primitivas utilizando el shader actualmente activo */
@@ -206,7 +216,7 @@ int main(int argc, char *argv[]) {
      * especifica el índice inicial del array de vertices, el último parametro
      * especifica cuántos verttices queremos dibujar que es 3, ya que nuestro
      * arreglo de vertices tiene exactamente 3 vertices */
-    //glDrawArrays(GL_LINE_LOOP, 0, 3);
+    // glDrawArrays(GL_LINE_LOOP, 0, 3);
 
     /* Ahora ya no dibujamos desde vertices sino desde los indices del
      * elememento, el primer argumento es el tipo el segudo cuantos vertices

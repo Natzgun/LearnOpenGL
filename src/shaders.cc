@@ -28,6 +28,7 @@ int main(int argc, char *argv[]) {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
+  glfwWindowHintString(GLFW_WAYLAND_APP_ID, "opengl-project");
   GLFWwindow *window = glfwCreateWindow(800, 600, "Full OpenGL", NULL, NULL);
 
   if (window == NULL) {
