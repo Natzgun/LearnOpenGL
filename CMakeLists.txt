@@ -18,6 +18,6 @@ set(SOURCES
   src/Shader.cc
 )
 
-add_executable(OpenGL-project src/shaders.cc ${SOURCES})
+add_executable(OpenGL-project src/textures.cc ${SOURCES})
 
 target_link_libraries(OpenGL-project glad ${GLFW_LIBRARIES} dl GL)

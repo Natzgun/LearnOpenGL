@@ -6,10 +6,12 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <map>
 
 class Shader {
 public:
   unsigned int ID;
+  bool isValid;
 
   // Constructor reads and build  the shader
   Shader(const char* vertexPath, const char* fragmentPath);
@@ -21,6 +23,10 @@ public:
   void setInt(const std::string &name, int value) const;
   void setFloat(const std::string &name, float value) const;
   void setColorRGB(const std::string &name, float r, float g, float b) const;
+private:
+  int getUniformLocation(const std::string &name) const;
+  mutable std::map<std::string, int> uniformLocations;
+
 };
 
 #endif // !SHADER_H

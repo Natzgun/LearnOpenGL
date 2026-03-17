@@ -59,8 +59,8 @@ int main(int argc, char *argv[]) {
   }
 
   /* ----------- SETUP SHADERS -----------*/
-  Shader ourShader("../../src/shaders/shader.vert",
-                   "../../src/shaders/shader.frag");
+  Shader ourShader("../../src/shaders/texture.vert",
+                   "../../src/shaders/texture.frag");
 
   /* ------------ SETUP VERTEX DATA ------------*/
   /* Verices del triangulo pero estas coordenadas estan en NDC (Normalized
@@ -78,8 +78,8 @@ int main(int argc, char *argv[]) {
   // triangulos los indices son las posiciones de los vertices, asi evitamos
   // sobreposicion de vertices
   unsigned int indices[] = {
-      0, 1, 2, // first triangle
-      // 1, 2, 3  // second triangle
+      0, 1, 3, // first triangle
+      1, 2, 3  // second triangle
   };
 
   /* Aqui creamos un Vertex buffer object, generamos ese buffer que viene desde
@@ -137,9 +137,10 @@ int main(int argc, char *argv[]) {
 
   // Genera y enlaza un objeto de textura. Luego, carga los datos de la imagen en él
   // y genera mipmaps para un escalado adecuado.
-  unsigned int texture;
-  glGenTextures(1, &texture);
-  glBindTexture(GL_TEXTURE_2D, texture);
+  unsigned int texture1, texture2;
+  glGenTextures(1, &texture1);
+  glBindTexture(GL_TEXTURE_2D, texture1);
+
 
   // Set texture wrapping parameters.
   // GL_TEXTURE_WRAP_S sets the wrap parameter for the S (or X) coordinate.
@@ -161,6 +162,7 @@ int main(int argc, char *argv[]) {
 
   // We can read a texture
   int width, height, nrChannels;
+  stbi_set_flip_vertically_on_load(true);
   unsigned char *data =
       stbi_load("../../assets/container.jpg", &width, &height, &nrChannels, 0);
 
@@ -174,6 +176,36 @@ int main(int argc, char *argv[]) {
   }
 
   stbi_image_free(data);
+
+  glGenTextures(1, &texture2);
+  glBindTexture(GL_TEXTURE_2D, texture2);
+
+  // Wrap texture coordinates (s and t) on both axes
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+  // Filtering parameters for minification and magnification Mipmaps
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  // Load second texture
+  data = stbi_load("../../assets/agnes.png", &width, &height, &nrChannels, 4);
+  if (data) {
+    std::cout << "Texture loaded successfully: " << width << "x" << height
+              << " with " << nrChannels << " channels." << std::endl;
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
+                 GL_UNSIGNED_BYTE, data);
+    std::cout << "Texture data loaded into OpenGL successfully." << std::endl;
+    glGenerateMipmap(GL_TEXTURE_2D);
+  } else {
+    std::cout << "Failed to load texture" << std::endl;
+  }
+
+  stbi_image_free(data);
+
+  ourShader.use();
+  glUniform1i(glGetUniformLocation(ourShader.ID, "texture1"), 0);
+  ourShader.setInt("texture2", 1);
 
   // To draw in wireframe mode, uncomment the following line.
   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -202,15 +234,17 @@ int main(int argc, char *argv[]) {
     
     float timeValue = glfwGetTime();
 
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture1);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, texture2);
+
     ourShader.use();
-    ourShader.setFloat("xOffset", xMove);
-    ourShader.setFloat("yOffset", yMove);
-    ourShader.setFloat("time", timeValue);
 
     // ourShader.setColorRGB("customColor", colors[0], colors[1], colors[2]);
     glBindVertexArray(VAO);
 
-    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
     /* glfwSwapBuffers(window) intercambia el back buffer (donde OpenGL dibuja)
     con el front buffer (lo que se ve en pantalla). Durante cada frame, todo
