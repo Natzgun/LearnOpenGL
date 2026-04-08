@@ -1,6 +1,6 @@
 #version 330 core
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec3 aColor;
+layout(location = 0) in vec3 aPos;
+layout(location = 1) in vec3 aColor;
 
 out vec3 ourColor;
 
@@ -12,12 +12,13 @@ void main() {
   float angle = time;
   mat3 rotation = mat3(
     cos(angle), -sin(angle), 0,
-    sin(angle),  cos(angle), 0,
-    0         ,  0         , 1
-  );
+    sin(angle), cos(angle), 0,
+    0, 0, 1
+    );
+  mat3 rotation = mat3();
   // mat3 rotation = mat3(
   //   cos(angle), 0, sin(angle),
-  //   0         , 1,           0, 
+  //   0         , 1,           0,
   //   -sin(angle), 0, cos(angle)
   // );
 

@@ -1,3 +1,6 @@
 .cache
 out
 compile_commands.json
+build
+cmake-build-debug
+.idea

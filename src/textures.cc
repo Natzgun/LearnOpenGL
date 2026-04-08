@@ -11,7 +11,7 @@ void processInput(GLFWwindow *window);
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
 float xMove = 0.0f;
-float yMove = 0.0f;
+float yMove = 0.5f;
 
 int main(int argc, char *argv[]) {
   /* Esto inicializa GLFW con sus valores predeterminados, retorna GLFW_TRUE si
@@ -59,8 +59,8 @@ int main(int argc, char *argv[]) {
   }
 
   /* ----------- SETUP SHADERS -----------*/
-  Shader ourShader("../../src/shaders/texture.vert",
-                   "../../src/shaders/texture.frag");
+  Shader ourShader("shaders/texture.vert",
+                   "shaders/texture.frag");
 
   /* ------------ SETUP VERTEX DATA ------------*/
   /* Verices del triangulo pero estas coordenadas estan en NDC (Normalized
@@ -164,7 +164,7 @@ int main(int argc, char *argv[]) {
   int width, height, nrChannels;
   stbi_set_flip_vertically_on_load(true);
   unsigned char *data =
-      stbi_load("../../assets/container.jpg", &width, &height, &nrChannels, 0);
+      stbi_load("assets/container.jpg", &width, &height, &nrChannels, 0);
 
   if (data) {
     // Load the image data into the currently bound 2D texture object.
@@ -181,15 +181,15 @@ int main(int argc, char *argv[]) {
   glBindTexture(GL_TEXTURE_2D, texture2);
 
   // Wrap texture coordinates (s and t) on both axes
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
-  // Filtering parameters for minification and magnification Mipmaps
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  //  Filtering parameters for minification and magnification Mipmaps
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
   // Load second texture
-  data = stbi_load("../../assets/agnes.png", &width, &height, &nrChannels, 4);
+  data = stbi_load("assets/agnes.png", &width, &height, &nrChannels, 4);
   if (data) {
     std::cout << "Texture loaded successfully: " << width << "x" << height
               << " with " << nrChannels << " channels." << std::endl;
@@ -240,6 +240,8 @@ int main(int argc, char *argv[]) {
     glBindTexture(GL_TEXTURE_2D, texture2);
 
     ourShader.use();
+    ourShader.setFloat("time", timeValue);
+    ourShader.setFloat("mixValue", yMove) ;
 
     // ourShader.setColorRGB("customColor", colors[0], colors[1], colors[2]);
     glBindVertexArray(VAO);
@@ -267,14 +269,10 @@ void processInput(GLFWwindow *window) {
    * una ventana especifica*/
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, true);
-  } else if (glfwGetKey(window, GLFW_KEY_W)) {
-    yMove += 0.005;
-  } else if (glfwGetKey(window, GLFW_KEY_A)) {
-    xMove -= 0.005;
-  } else if (glfwGetKey(window, GLFW_KEY_S)) {
-    yMove -= 0.005;
-  } else if (glfwGetKey(window, GLFW_KEY_D)) {
-    xMove += 0.005;
+  } else if (glfwGetKey(window, GLFW_KEY_UP)) {
+    yMove += 0.05;
+  } else if (glfwGetKey(window, GLFW_KEY_DOWN)) {
+    yMove -= 0.05;
   }
 
 

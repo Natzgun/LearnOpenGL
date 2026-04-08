@@ -21,3 +21,13 @@ set(SOURCES
 add_executable(OpenGL-project src/textures.cc ${SOURCES})
 
 target_link_libraries(OpenGL-project glad ${GLFW_LIBRARIES} dl GL)
+
+# Copy assets and shaders to the build directory on every build
+# so that relative paths like "assets/texture.png" work regardless of cwd
+add_custom_command(TARGET OpenGL-project POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:OpenGL-project>/assets)
+
+add_custom_command(TARGET OpenGL-project POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_SOURCE_DIR}/src/shaders $<TARGET_FILE_DIR:OpenGL-project>/shaders)
